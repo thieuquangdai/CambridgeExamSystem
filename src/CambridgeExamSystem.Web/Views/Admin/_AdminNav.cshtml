@@ -1,0 +1,11 @@
+@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<ul class="nav nav-tabs mb-4">
+    <li class="nav-item"><a class="nav-link @(action == "Index" ? "active" : "")" asp-action="Index">Tổng quan</a></li>
+    <li class="nav-item"><a class="nav-link @(action is "Exams" or "Content" or "AddQuestion" or "EditExam" or "CreateExam" or "SaveExam" ? "active" : "")" asp-action="Exams">Đề thi</a></li>
+    @if (User.IsInRole(RoleNames.Admin))
+    {
+        <li class="nav-item"><a class="nav-link @(action == "Users" ? "active" : "")" asp-action="Users">Người dùng</a></li>
+    }
+</ul>

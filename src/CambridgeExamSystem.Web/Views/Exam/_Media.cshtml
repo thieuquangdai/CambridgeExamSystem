@@ -1,0 +1,19 @@
+@model List<MediaDto>
+@foreach (var media in Model)
+{
+    switch (media.MediaType)
+    {
+        case "Image":
+            <img src="@media.FileUrl" alt="@(media.AltText ?? "Hình minh hoạ")" class="img-fluid rounded mb-2 d-block" loading="lazy" />
+            break;
+        case "Audio":
+            <audio controls preload="metadata" class="w-100 mb-2" src="@media.FileUrl">Trình duyệt không hỗ trợ audio.</audio>
+            break;
+        case "Video":
+            <video controls preload="metadata" class="w-100 mb-2 rounded" src="@media.FileUrl">Trình duyệt không hỗ trợ video.</video>
+            break;
+        default:
+            <a href="@media.FileUrl" target="_blank" rel="noopener" class="d-block mb-2">📄 @(media.FileName ?? "Tài liệu")</a>
+            break;
+    }
+}

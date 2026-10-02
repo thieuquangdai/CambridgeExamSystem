@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2A546D8F-2A0E-4F10-9C75-4E0839EA6962}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CambridgeExamSystem.Application", "src\CambridgeExamSystem.Application\CambridgeExamSystem.Application.csproj", "{288CC4BF-C097-479B-A04A-383BD32E7F31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CambridgeExamSystem.Domain", "src\CambridgeExamSystem.Domain\CambridgeExamSystem.Domain.csproj", "{429A6D99-E0D5-4B48-854E-15528FE0CA73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CambridgeExamSystem.Infrastructure", "src\CambridgeExamSystem.Infrastructure\CambridgeExamSystem.Infrastructure.csproj", "{07128FB8-0377-4F91-8BC2-A5627973593E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CambridgeExamSystem.Web", "src\CambridgeExamSystem.Web\CambridgeExamSystem.Web.csproj", "{211C9B6A-BA22-46B3-993A-4EDAA93FDE5B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4CFB8250-B520-4DD9-A15D-D043856A88EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CambridgeExamSystem.Tests", "tests\CambridgeExamSystem.Tests\CambridgeExamSystem.Tests.csproj", "{F47499D8-11AF-4ED9-8FF5-A32D7D1683B9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{288CC4BF-C097-479B-A04A-383BD32E7F31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{288CC4BF-C097-479B-A04A-383BD32E7F31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{288CC4BF-C097-479B-A04A-383BD32E7F31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{288CC4BF-C097-479B-A04A-383BD32E7F31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{429A6D99-E0D5-4B48-854E-15528FE0CA73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{429A6D99-E0D5-4B48-854E-15528FE0CA73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{429A6D99-E0D5-4B48-854E-15528FE0CA73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{429A6D99-E0D5-4B48-854E-15528FE0CA73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07128FB8-0377-4F91-8BC2-A5627973593E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07128FB8-0377-4F91-8BC2-A5627973593E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07128FB8-0377-4F91-8BC2-A5627973593E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07128FB8-0377-4F91-8BC2-A5627973593E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{211C9B6A-BA22-46B3-993A-4EDAA93FDE5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{211C9B6A-BA22-46B3-993A-4EDAA93FDE5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{211C9B6A-BA22-46B3-993A-4EDAA93FDE5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{211C9B6A-BA22-46B3-993A-4EDAA93FDE5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F47499D8-11AF-4ED9-8FF5-A32D7D1683B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F47499D8-11AF-4ED9-8FF5-A32D7D1683B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F47499D8-11AF-4ED9-8FF5-A32D7D1683B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F47499D8-11AF-4ED9-8FF5-A32D7D1683B9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{288CC4BF-C097-479B-A04A-383BD32E7F31} = {2A546D8F-2A0E-4F10-9C75-4E0839EA6962}
+		{429A6D99-E0D5-4B48-854E-15528FE0CA73} = {2A546D8F-2A0E-4F10-9C75-4E0839EA6962}
+		{07128FB8-0377-4F91-8BC2-A5627973593E} = {2A546D8F-2A0E-4F10-9C75-4E0839EA6962}
+		{211C9B6A-BA22-46B3-993A-4EDAA93FDE5B} = {2A546D8F-2A0E-4F10-9C75-4E0839EA6962}
+		{F47499D8-11AF-4ED9-8FF5-A32D7D1683B9} = {4CFB8250-B520-4DD9-A15D-D043856A88EA}
+	EndGlobalSection
+EndGlobal

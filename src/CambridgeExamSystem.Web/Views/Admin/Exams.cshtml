@@ -1,0 +1,32 @@
+@model List<ExamPaperSummaryDto>
+@{
+    ViewData["Title"] = "Quản lý đề thi";
+}
+<h1 class="h3 mb-3">Quản trị</h1>
+<partial name="_AdminNav" />
+<div class="d-flex justify-content-between mb-3">
+    <h2 class="h5 mb-0">Đề thi (@Model.Count)</h2>
+    <a class="btn btn-primary btn-sm" asp-action="CreateExam">+ Tạo đề thi</a>
+</div>
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead><tr><th>Mã</th><th>Tên đề</th><th>Cấp độ</th><th class="text-end">Câu</th><th class="text-end">Điểm</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var exam in Model)
+            {
+                <tr>
+                    <td><code>@exam.ExamCode</code></td>
+                    <td>@exam.ExamName</td>
+                    <td>@exam.LevelName</td>
+                    <td class="text-end">@exam.QuestionCount</td>
+                    <td class="text-end">@DisplayFormat.Score(exam.TotalScore)</td>
+                    <td><span class="badge @(exam.IsPublished ? "bg-success" : "bg-secondary")">@(exam.IsPublished ? "Đã xuất bản" : "Nháp")</span></td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Content" asp-route-id="@exam.ExamPaperId">Nội dung</a>
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="EditExam" asp-route-id="@exam.ExamPaperId">Sửa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,57 @@
+@model CambridgeExamSystem.Web.Models.Account.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký";
+    var levels = ViewBag.Levels as List<ExamLevelDto> ?? [];
+}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-3">Tạo tài khoản học viên</h1>
+                <form asp-action="Register" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" autocomplete="name" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" autocomplete="email" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <label asp-for="DateOfBirth" class="form-label"></label>
+                            <input asp-for="DateOfBirth" type="date" class="form-control" />
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label asp-for="CurrentLevelCode" class="form-label"></label>
+                            <select asp-for="CurrentLevelCode" class="form-select">
+                                <option value="">-- Chọn --</option>
+                                @foreach (var level in levels)
+                                {
+                                    <option value="@level.LevelCode">@level.LevelName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                        <div class="form-text">Ít nhất 8 ký tự, gồm chữ thường và chữ số.</div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
+                </form>
+                <p class="mt-3 mb-0 small text-center">Đã có tài khoản? <a asp-action="Login">Đăng nhập</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,29 @@
+@model List<AttemptHistoryItemDto>
+@if (Model.Count == 0)
+{
+    <p class="text-muted">Chưa có bài làm nào.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr><th>Đề thi</th><th>Lần</th><th>Nộp lúc</th><th class="text-end">Điểm</th><th class="text-end">%</th><th class="text-end">Sao</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.ExamName <small class="text-muted d-block">@item.LevelName @(item.Status == "Expired" ? "· Hết giờ" : "")</small></td>
+                        <td>#@item.AttemptNumber</td>
+                        <td><time data-utc="@DisplayFormat.LocalTime(item.SubmittedAtUtc)"></time></td>
+                        <td class="text-end">@DisplayFormat.Score(item.TotalScore)/@DisplayFormat.Score(item.MaxScore)</td>
+                        <td class="text-end">@DisplayFormat.Percent(item.PercentageScore)</td>
+                        <td class="text-end">@item.StarsEarned ★</td>
+                        <td class="text-end"><a class="btn btn-sm btn-outline-primary" asp-controller="Result" asp-action="Details" asp-route-id="@item.ExamAttemptId">Xem</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

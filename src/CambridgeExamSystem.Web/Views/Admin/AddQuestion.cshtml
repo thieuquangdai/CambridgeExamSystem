@@ -1,0 +1,104 @@
+@model CambridgeExamSystem.Web.Models.Admin.QuestionFormViewModel
+@{
+    ViewData["Title"] = "Thêm câu hỏi";
+}
+<h1 class="h3 mb-3">Quản trị</h1>
+<partial name="_AdminNav" />
+<h2 class="h5">Thêm câu hỏi · @Model.ExamName · @Model.SectionName</h2>
+<form asp-action="AddQuestion" method="post" enctype="multipart/form-data" class="card shadow-sm" id="question-form">
+    <div class="card-body">
+        <div asp-validation-summary="All" class="text-danger small"></div>
+        <input type="hidden" asp-for="ExamPaperId" />
+        <input type="hidden" asp-for="Question.ExamSectionId" />
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label asp-for="Question.QuestionTypeId" class="form-label">Loại câu hỏi</label>
+                <select asp-for="Question.QuestionTypeId" class="form-select" id="question-type" required>
+                    @foreach (var type in Model.QuestionTypes)
+                    {
+                        <option value="@type.QuestionTypeId" data-code="@type.TypeCode" data-options="@(type.RequiresOptions ? "true" : "false")">@type.TypeName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Question.QuestionCode" class="form-label">Mã câu (tuỳ chọn)</label>
+                <input asp-for="Question.QuestionCode" class="form-control" maxlength="50" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="Question.Score" class="form-label">Điểm</label>
+                <input asp-for="Question.Score" type="number" min="0.25" max="100" step="0.25" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="Question.DifficultyCode" class="form-label">Độ khó</label>
+                <select asp-for="Question.DifficultyCode" class="form-select">
+                    <option value="">--</option>
+                    @foreach (var d in Enum.GetNames<DifficultyLevel>())
+                    {
+                        <option value="@d">@d</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12">
+                <label asp-for="Question.QuestionText" class="form-label">Nội dung câu hỏi</label>
+                <textarea asp-for="Question.QuestionText" rows="3" class="form-control" required></textarea>
+            </div>
+            <div class="col-12">
+                <label asp-for="Question.InstructionText" class="form-label">Hướng dẫn</label>
+                <input asp-for="Question.InstructionText" class="form-control" />
+            </div>
+        </div>
+
+        <fieldset class="mt-4" id="options-block">
+            <legend class="h6">Lựa chọn <small class="text-muted" id="options-hint"></small></legend>
+            <div id="options-list">
+                @for (var i = 0; i < Model.Question.Options.Count; i++)
+                {
+                    <div class="row g-2 mb-2 option-row">
+                        <div class="col-md-7"><input name="Question.Options[@i].OptionText" value="@Model.Question.Options[i].OptionText" class="form-control" placeholder="Lựa chọn @(i + 1)" aria-label="Lựa chọn @(i + 1)" /></div>
+                        <div class="col-md-3 matching-col"><input name="Question.Options[@i].MatchingKey" value="@Model.Question.Options[i].MatchingKey" class="form-control" placeholder="Khoá nối (vd: A)" aria-label="Khoá nối" /></div>
+                        <div class="col-md-2 correct-col d-flex align-items-center">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="Question.Options[@i].IsCorrect" value="true" id="opt-correct-@i" checked="@Model.Question.Options[i].IsCorrect" />
+                                <label class="form-check-label" for="opt-correct-@i">Đúng</label>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="add-option">+ Thêm lựa chọn</button>
+        </fieldset>
+
+        <div class="mt-4" id="text-answer-block">
+            <label asp-for="Question.CorrectTextAnswer" class="form-label">Đáp án đúng (nhiều đáp án chấp nhận, ngăn cách bởi <code>|</code>)</label>
+            <input asp-for="Question.CorrectTextAnswer" class="form-control" />
+        </div>
+
+        <div class="row g-3 mt-2">
+            <div class="col-md-6">
+                <label asp-for="Question.ExplanationText" class="form-label">Giải thích</label>
+                <textarea asp-for="Question.ExplanationText" rows="3" class="form-control"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Question.TranscriptText" class="form-label">Transcript (Listening)</label>
+                <textarea asp-for="Question.TranscriptText" rows="3" class="form-control"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ImageFile" class="form-label">Hình ảnh</label>
+                <input asp-for="ImageFile" type="file" accept="image/*" class="form-control" />
+                <input asp-for="Question.ImageUrl" class="form-control mt-1" placeholder="hoặc URL hình ảnh" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="AudioFile" class="form-label">Audio</label>
+                <input asp-for="AudioFile" type="file" accept="audio/*" class="form-control" />
+                <input asp-for="Question.AudioUrl" class="form-control mt-1" placeholder="hoặc URL audio" />
+            </div>
+        </div>
+    </div>
+    <div class="card-footer d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Lưu câu hỏi</button>
+        <a class="btn btn-outline-secondary" asp-action="Content" asp-route-id="@Model.ExamPaperId">Huỷ</a>
+    </div>
+</form>
+@section Scripts {
+    <script src="~/js/admin-question.js" asp-append-version="true"></script>
+}

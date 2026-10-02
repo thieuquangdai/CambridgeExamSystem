@@ -1,0 +1,19 @@
+@model List<ActiveAttemptDto>
+@if (Model.Count > 0)
+{
+    <div class="card border-warning mb-4">
+        <div class="card-header bg-warning-subtle fw-semibold">Bài đang làm dở</div>
+        <ul class="list-group list-group-flush">
+            @foreach (var attempt in Model)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <div class="fw-semibold">@attempt.ExamName</div>
+                        <small class="text-muted">@attempt.LevelName · Đã trả lời @attempt.AnsweredCount câu · Còn @DisplayFormat.Duration(attempt.RemainingSeconds) · Lưu lúc <time data-utc="@DisplayFormat.LocalTime(attempt.LastSavedAtUtc)"></time></small>
+                    </div>
+                    <a class="btn btn-sm btn-warning" asp-controller="Exam" asp-action="Take" asp-route-id="@attempt.ExamAttemptId">Tiếp tục</a>
+                </li>
+            }
+        </ul>
+    </div>
+}

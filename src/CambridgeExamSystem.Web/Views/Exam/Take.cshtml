@@ -1,0 +1,117 @@
+@model TakeTestDto
+@using System.Text.Json
+@{
+    ViewData["Title"] = Model.ExamName;
+    var allQuestions = Model.Sections.SelectMany(s => s.Questions).ToList();
+    var groups = Model.Sections.SelectMany(s => s.Groups).ToDictionary(g => g.QuestionGroupId);
+    var saved = Model.SavedAnswers.ToDictionary(a => a.QuestionId);
+    var config = new
+    {
+        examAttemptId = Model.ExamAttemptId,
+        remainingSeconds = Model.RemainingSeconds,
+        currentQuestionIndex = Model.CurrentQuestionIndex,
+        totalQuestions = Model.TotalQuestions,
+        saveUrl = Url.Action("SaveAnswer", "Exam"),
+        pauseUrl = Url.Action("Pause", "Exam"),
+        exitUrl = Url.Action("Index", "Exam"),
+        resultUrl = Url.Action("Details", "Result", new { id = Model.ExamAttemptId }),
+        savedAnswers = Model.SavedAnswers
+    };
+}
+<div id="exam-app" class="exam-app">
+    <div class="exam-toolbar sticky-top bg-body border-bottom py-2 mb-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <div class="fw-semibold">@Model.ExamName</div>
+                <small class="text-muted">@Model.LevelName · <span id="answered-count">0</span>/@Model.TotalQuestions câu đã trả lời</small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span id="save-status" class="small text-muted" aria-live="polite">@(Model.IsResumed ? "Đã khôi phục bài làm" : "Sẵn sàng")</span>
+                <span id="timer" class="badge bg-dark fs-6 font-monospace" aria-label="Thời gian còn lại">--:--</span>
+                <button type="button" id="btn-pause" class="btn btn-outline-secondary btn-sm">Tạm dừng &amp; thoát</button>
+                <button type="button" id="btn-submit" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#submitModal">Nộp bài</button>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.IsResumed)
+    {
+        <div class="alert alert-info py-2 small">Bạn đang tiếp tục bài làm trước đó. Các câu trả lời đã lưu được khôi phục.</div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-9 order-2 order-lg-1">
+            @foreach (var sec in Model.Sections)
+            {
+                foreach (var question in sec.Questions)
+                {
+                    saved.TryGetValue(question.QuestionId, out var answer);
+                    var group = question.QuestionGroupId is int gid && groups.TryGetValue(gid, out var g) ? g : null;
+                    <div class="question-panel card shadow-sm d-none" data-index="@question.Index" data-question-id="@question.QuestionId" data-type="@question.TypeCode">
+                        <div class="card-header d-flex justify-content-between">
+                            <span><span class="badge @DisplayFormat.SectionBadge(sec.SectionCode) me-2">@sec.SectionName</span>Câu @(question.Index + 1)/@Model.TotalQuestions</span>
+                            <small class="text-muted">@DisplayFormat.Score(question.Score) điểm</small>
+                        </div>
+                        <div class="card-body translatable">
+                            @if (group is not null)
+                            {
+                                <div class="passage mb-3 p-3 rounded bg-body-tertiary">
+                                    @if (!string.IsNullOrWhiteSpace(group.GroupTitle)) { <h2 class="h6">@group.GroupTitle</h2> }
+                                    @if (!string.IsNullOrWhiteSpace(group.Instructions)) { <p class="fst-italic small">@group.Instructions</p> }
+                                    <partial name="_Media" model="group.Media" />
+                                    @if (!string.IsNullOrWhiteSpace(group.PassageText)) { <p class="mb-0 passage-text">@group.PassageText</p> }
+                                </div>
+                            }
+                            <partial name="_Question" model="(question, answer)" />
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-primary btn-nav" data-step="-1">← Câu trước</button>
+                            <button type="button" class="btn btn-primary btn-nav" data-step="1">Câu sau →</button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <div class="col-lg-3 order-1 order-lg-2">
+            <div class="card shadow-sm question-palette">
+                <div class="card-header small fw-semibold">Danh sách câu hỏi</div>
+                <div class="card-body d-flex flex-wrap gap-1">
+                    @foreach (var question in allQuestions)
+                    {
+                        <button type="button" class="btn btn-sm btn-outline-secondary palette-btn" data-goto="@question.Index" aria-label="Câu @(question.Index + 1)">@(question.Index + 1)</button>
+                    }
+                </div>
+                <div class="card-footer small text-muted">
+                    <span class="legend legend-answered"></span> Đã trả lời
+                    <span class="legend legend-current ms-2"></span> Đang xem
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="submitModal" tabindex="-1" aria-labelledby="submitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="submitModalLabel">Nộp bài?</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p id="submit-summary" class="mb-0"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Làm tiếp</button>
+                <form id="submit-form" asp-action="Submit" method="post">
+                    <input type="hidden" name="examAttemptId" value="@Model.ExamAttemptId" />
+                    <button type="submit" class="btn btn-success">Nộp bài</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script id="exam-config" type="application/json">@Html.Raw(JsonSerializer.Serialize(config, new JsonSerializerOptions(JsonSerializerDefaults.Web)).Replace("</", "<\\/"))</script>
+    <script src="~/js/exam.js" asp-append-version="true"></script>
+}

@@ -1,130 +1,65 @@
 # Cambridge English Exam Management System
 
-## 🎯 Giới Thiệu Dự Án
+Hệ thống luyện thi Cambridge English (Starters, Movers, Flyers, KET, PET) xây dựng bằng
+**ASP.NET Core MVC (.NET 8 LTS) + C# + SQL Server + Entity Framework Core 8**.
+Dự án không dùng ASP.NET MVC 5 hay `System.Web`, có thể chạy trên Windows/IIS, Linux hoặc container.
 
-Hệ thống quản lý bài thi Cambridge trực tuyến được xây dựng bằng **ASP.NET MVC 5** và **C#**
+## Tính năng
 
-### 🌟 Tính Năng Chính
+- Làm bài thi trực tuyến: Listening, Reading, Writing, Speaking; ảnh, audio, video, tài liệu, transcript.
+- 7 dạng câu hỏi: trắc nghiệm một/nhiều đáp án, đúng/sai, điền chỗ trống, trả lời ngắn, nối, sắp xếp.
+- Tự động lưu (AJAX + localStorage khi mất mạng), tạm dừng và tiếp tục bài làm dở, đồng hồ đếm ngược phía server.
+- Chấm điểm phía server; đáp án đúng không bao giờ được gửi xuống trình duyệt khi đang làm bài.
+- Kết quả chi tiết theo phần và từng câu, giải thích, ghi chú ngữ pháp/từ vựng, lịch sử làm bài.
+- Sao, hạng (Bronze → Diamond), thành tích, bảng xếp hạng tuần/tháng/mọi thời điểm.
+- Dịch bằng cách bôi đen văn bản, lưu và đánh dấu từ vựng.
+- Quản trị: đề thi, phần thi, câu hỏi, đáp án, upload ảnh/audio, xuất bản, người dùng và phân quyền.
+- Đăng ký/đăng nhập bằng ASP.NET Core Identity (mật khẩu được hash, khoá tài khoản khi sai nhiều lần, anti-forgery).
 
-- 📝 Làm Bài Thi Trực Tuyến (Starts, Moves, Flyer, KET, PET)
-- 🏆 Bảng Xếp Hạng với Sao & Cúp
-- 🎖️ Hệ Thống Thành Tích (8+ loại Badge)
-- 🔤 Dịch Văn Bản bằng quét chuột
-- 💪 Hệ Thống Khích Lệ & Động Viên
-- ⏱️ Lưu Tự Động (Phục hồi phiên)
-- 📊 Phân Tích Chi Tiết Kết Quả
+## Cấu trúc
 
-### 🛠️ Công Nghệ Sử Dụng
-
-- **Frontend**: ASP.NET MVC 5, Razor, HTML5, CSS3, Bootstrap, jQuery
-- **Backend**: C#, .NET Framework 4.7.2, Entity Framework 6
-- **Database**: SQL Server 2019/2022
-- **API**: Google Translate, Dictionary API
-
-## 📁 Cấu Trúc Dự Án
-
-```
+```text
 CambridgeExamSystem/
 ├── CambridgeExamSystem.sln
-├── CambridgeExamSystem.Web/          [ASP.NET MVC]
-├── CambridgeExamSystem.Business/     [Business Logic]
-├── CambridgeExamSystem.Data/         [Data Access]
-├── CambridgeExamSystem.Common/       [Shared]
-├── CambridgeExamSystem.Tests/        [Tests]
-├── Database/                         [SQL Scripts]
-└── Documentation/                    [Hướng dẫn]
+├── Directory.Build.props / Directory.Packages.props   # net8.0 + phiên bản NuGet dùng chung
+├── src/
+│   ├── CambridgeExamSystem.Domain/          # Entity, enum, hằng số – không phụ thuộc project nào
+│   ├── CambridgeExamSystem.Application/     # Interface, DTO, service, validator, AutoMapper – chỉ phụ thuộc Domain
+│   ├── CambridgeExamSystem.Infrastructure/  # EF Core, SQL Server, Identity store, repository, dịch vụ ngoài, migrations
+│   └── CambridgeExamSystem.Web/             # Controller, Razor View, authentication, wwwroot
+├── tests/CambridgeExamSystem.Tests/         # xUnit: unit + integration (SQL Server)
+├── database/                                # Script SQL (schema sinh từ migrations, seed, stored procedures)
+└── docs/                                    # INSTALLATION, DATABASE, ARCHITECTURE
 ```
 
-## 🚀 Cài Đặt Nhanh
+## Chạy nhanh
 
-### Yêu Cầu Hệ Thống
-- Visual Studio 2022 Community
-- SQL Server 2019/2022 Express
-- .NET Framework 4.7.2+
+Yêu cầu: [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) và SQL Server 2019+ (LocalDB, Express, Developer hoặc Docker).
 
-### Các Bước
-
-#### 1. Giải Nén & Mở Solution
-```
-1. Giải nén file .zip
-2. Mở CambridgeExamSystem.sln trong Visual Studio
+```bash
+dotnet tool restore
+cd src/CambridgeExamSystem.Web
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Database=CambridgeExamDb;User Id=sa;Password=<mật khẩu>;TrustServerCertificate=True"
+dotnet user-secrets set "Seed:AdminPassword" "<mật khẩu admin>"
+dotnet run
 ```
 
-#### 2. Thiết Lập Database
-```
-1. Mở SQL Server Management Studio
-2. Chạy các file SQL theo thứ tự:
-   - Database/Schema/01_CreateTables.sql
-   - Database/Schema/02_CreateIndexes.sql
-   - Database/Schema/03_CreateRelationships.sql
-   - Database/StoredProcedures/[tất cả]
-   - Database/Seeds/[dữ liệu mẫu]
-```
+Khi khởi động, ứng dụng tự áp dụng migrations, tạo vai trò, dữ liệu tham chiếu, đề mẫu `KET-SAMPLE-01`
+và tài khoản admin `admin@cambridge.local` (môi trường Development). Trên Windows có LocalDB thì không cần đặt
+connection string. Chi tiết: [docs/INSTALLATION.md](docs/INSTALLATION.md) · [QUICK_START.md](QUICK_START.md).
 
-#### 3. Cấu Hình Connection String
-```
-Mở: CambridgeExamSystem.Web/Web.config
-Tìm và sửa:
-<add name="CambridgeDbContext" 
-     connectionString="Server=YOUR_SERVER;Database=CambridgeExamSystem;Trusted_Connection=true;" 
-     providerName="System.Data.SqlClient" />
+## Kiểm thử
 
-Thay YOUR_SERVER bằng tên server của bạn
-Ví dụ: THIEUQUANGDAI\SQLEXPRESS hoặc localhost
+```bash
+dotnet build
+dotnet test                                    # integration test SQL Server sẽ được bỏ qua
+CAMBRIDGE_TEST_SQLSERVER="Server=localhost;User Id=sa;Password=<mật khẩu>;TrustServerCertificate=True" dotnet test
 ```
 
-#### 4. Cài NuGet Packages
-```
-Trong Visual Studio:
-Tools → NuGet Package Manager → Package Manager Console
-Chạy: Update-Package
-```
+Integration test tạo một database tạm riêng cho mỗi lần chạy và xoá sau khi xong.
 
-#### 5. Chạy Ứng Dụng
-```
-Nhấn F5 hoặc Click Start Debugging
-Ứng dụng mở tại: http://localhost:xxxx
-```
+## Tài liệu
 
-## 👤 Tài Khoản Mẫu
-
-```
-Username: student1
-Password: Password@123
-
-hoặc
-
-Username: admin
-Password: Admin@123
-```
-
-## 📚 Tài Liệu
-
-- [Hướng Dẫn Cài Đặt Chi Tiết](Documentation/INSTALLATION.md)
-- [Bắt Đầu Nhanh](Documentation/QUICK_START.md)
-- [Thiết Lập Database](Documentation/DATABASE_SETUP.md)
-
-## 🐛 Khắc Phục Sự Cố
-
-### Lỗi Connection String
-- Kiểm tra tên server SQL (Tools → Connect to Database)
-- Cập nhật trong Web.config
-- Đảm bảo SQL Server đang chạy
-
-### Lỗi Missing Tables
-- Chạy lại file 01_CreateTables.sql
-- Kiểm tra database name
-
-### Lỗi 404 Pages
-- Xóa bin/obj folders
-- Rebuild solution (Ctrl+Shift+B)
-- Xóa browser cache
-
-## 📞 Liên Hệ
-
-- GitHub: [thieuquangdai/CambridgeExamSystem](https://github.com/thieuquangdai/CambridgeExamSystem)
-- Email: thieuquangdai@example.com
-
----
-
-**Made with ❤️ for Cambridge English Learners**
+- [Cài đặt & triển khai IIS](docs/INSTALLATION.md)
+- [Cơ sở dữ liệu & migrations](docs/DATABASE.md)
+- [Kiến trúc](docs/ARCHITECTURE.md)

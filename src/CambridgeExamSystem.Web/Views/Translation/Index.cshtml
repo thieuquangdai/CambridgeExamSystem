@@ -1,0 +1,74 @@
+@model List<VocabularyDto>
+@{
+    ViewData["Title"] = "Từ vựng của tôi";
+    var bookmarked = ViewBag.Bookmarked is true;
+}
+<h1 class="h3 mb-3">Từ vựng của tôi</h1>
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form id="translate-form" class="row g-2">
+            <div class="col-md-9"><input type="text" id="translate-text" class="form-control" maxlength="500" placeholder="Nhập từ hoặc câu tiếng Anh..." aria-label="Văn bản cần dịch" required /></div>
+            <div class="col-md-3 d-grid"><button type="submit" class="btn btn-primary">Dịch</button></div>
+        </form>
+        <div id="translate-output" class="mt-3 d-none"></div>
+    </div>
+</div>
+<form method="get" class="d-flex gap-2 mb-3 flex-wrap">
+    <input type="search" name="search" value="@ViewBag.Search" class="form-control form-control-sm w-auto" placeholder="Tìm từ đã lưu" aria-label="Tìm" />
+    <div class="form-check align-self-center">
+        <input class="form-check-input" type="checkbox" name="bookmarked" value="true" id="bookmarked" checked="@bookmarked" onchange="this.form.submit()" />
+        <label class="form-check-label small" for="bookmarked">Chỉ từ đánh dấu</label>
+    </div>
+    <button type="submit" class="btn btn-sm btn-outline-secondary">Lọc</button>
+</form>
+@if (Model.Count == 0)
+{
+    <p class="text-muted">Chưa có từ vựng nào. Bôi đen từ trong bài thi hoặc dùng ô dịch phía trên rồi bấm "Lưu".</p>
+}
+<div class="row g-3">
+    @foreach (var v in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 vocab-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h2 class="h5 mb-0">@v.OriginalText</h2>
+                        <button type="button" class="btn btn-sm btn-link p-0 text-warning fs-5 bookmark-btn" data-id="@v.UserVocabularyId" aria-label="Đánh dấu">@(v.IsBookmarked ? "★" : "☆")</button>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(v.Phonetic)) { <div class="text-muted small">@v.Phonetic</div> }
+                    <p class="mb-1 mt-2 fw-semibold text-cambridge">@v.TranslatedText</p>
+                    @if (!string.IsNullOrWhiteSpace(v.DefinitionText)) { <p class="small mb-1">@v.DefinitionText</p> }
+                    @if (!string.IsNullOrWhiteSpace(v.ExampleText)) { <p class="small fst-italic text-muted mb-1">“@v.ExampleText”</p> }
+                    @if (!string.IsNullOrWhiteSpace(v.AudioUrl)) { <audio controls preload="none" class="w-100 mt-1" src="@v.AudioUrl"></audio> }
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center small text-muted">
+                    <span>Tra @v.Frequency lần</span>
+                    <form asp-action="Delete" asp-route-id="@v.UserVocabularyId" method="post" onsubmit="return confirm('Xoá từ này?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Xoá</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@section Scripts {
+    <script>
+        $(function () {
+            $('#translate-form').on('submit', function (e) {
+                e.preventDefault();
+                const text = $('#translate-text').val().trim();
+                if (!text) return;
+                const $out = $('#translate-output').removeClass('d-none').text('Đang dịch...');
+                CambridgeApp.translate(text).then(function (result) {
+                    $out.empty().append(CambridgeApp.renderTranslation(result, function () { window.location.reload(); }));
+                });
+            });
+            $('.bookmark-btn').on('click', function () {
+                const $btn = $(this);
+                CambridgeApp.post('@Url.Action("ToggleBookmark", "Translation")?id=' + $btn.data('id')).then(function (r) {
+                    $btn.text(r.isBookmarked ? '★' : '☆');
+                });
+            });
+        });
+    </script>
+}

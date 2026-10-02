@@ -1,0 +1,90 @@
+@model (TestQuestionDto Question, SavedAnswerDto? Answer)
+@using CambridgeExamSystem.Application.Services
+@{
+    var q = Model.Question;
+    var a = Model.Answer;
+    var payload = AnswerPayload.Parse(a?.AnswerJson);
+    var name = $"q{q.QuestionId}";
+}
+@if (!string.IsNullOrWhiteSpace(q.InstructionText))
+{
+    <p class="fst-italic small text-muted">@q.InstructionText</p>
+}
+<partial name="_Media" model="q.Media" />
+<p class="question-text fw-semibold">@q.QuestionText</p>
+@switch (q.TypeCode)
+{
+    case QuestionTypeCodes.MultipleChoice:
+    case QuestionTypeCodes.TrueFalse:
+        <div class="answer-options" role="radiogroup">
+            @foreach (var option in q.Options)
+            {
+                var id = $"{name}_o{option.QuestionOptionId}";
+                <div class="form-check option-item">
+                    <input class="form-check-input" type="radio" name="@name" id="@id" value="@option.QuestionOptionId" checked="@(a?.SelectedOptionId == option.QuestionOptionId)" />
+                    <label class="form-check-label w-100" for="@id">@(option.OptionCode is null ? "" : option.OptionCode + ". ")@option.OptionText</label>
+                </div>
+            }
+        </div>
+        break;
+    case QuestionTypeCodes.MultipleSelect:
+        <div class="answer-options">
+            @foreach (var option in q.Options)
+            {
+                var id = $"{name}_o{option.QuestionOptionId}";
+                <div class="form-check option-item">
+                    <input class="form-check-input" type="checkbox" name="@name" id="@id" value="@option.QuestionOptionId" checked="@(payload?.SelectedOptionIds?.Contains(option.QuestionOptionId) == true)" />
+                    <label class="form-check-label w-100" for="@id">@(option.OptionCode is null ? "" : option.OptionCode + ". ")@option.OptionText</label>
+                </div>
+            }
+        </div>
+        break;
+    case QuestionTypeCodes.FillBlank:
+        <input type="text" class="form-control answer-text" name="@name" value="@a?.TextAnswer" maxlength="500" autocomplete="off" aria-label="Câu trả lời" />
+        break;
+    case QuestionTypeCodes.ShortAnswer:
+        <textarea class="form-control answer-text" name="@name" rows="4" maxlength="4000" aria-label="Câu trả lời">@a?.TextAnswer</textarea>
+        break;
+    case QuestionTypeCodes.Matching:
+        <div class="matching-list">
+            @foreach (var option in q.Options)
+            {
+                string? current = null;
+                payload?.Matches?.TryGetValue(option.QuestionOptionId.ToString(), out current);
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-6"><span class="fw-semibold">@option.OptionText</span></div>
+                    <div class="col-sm-6">
+                        <select class="form-select match-select" data-option-id="@option.QuestionOptionId" aria-label="Nối với">
+                            <option value="">-- Chọn --</option>
+                            @foreach (var key in q.MatchingKeys)
+                            {
+                                <option value="@key" selected="@(string.Equals(current, key, StringComparison.OrdinalIgnoreCase))">@key</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
+        </div>
+        break;
+    case QuestionTypeCodes.Ordering:
+        var options = q.Options;
+        if (payload?.OrderedOptionIds is { Count: > 0 } savedOrder)
+        {
+            options = savedOrder.Select(id => q.Options.FirstOrDefault(o => o.QuestionOptionId == id)).OfType<TestOptionDto>()
+                .Concat(q.Options.Where(o => !savedOrder.Contains(o.QuestionOptionId))).ToList();
+        }
+        <ol class="list-group list-group-numbered ordering-list">
+            @foreach (var option in options)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center" data-option-id="@option.QuestionOptionId">
+                    <span class="ms-2 me-auto">@option.OptionText</span>
+                    <span class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-secondary btn-move" data-dir="-1" aria-label="Lên">↑</button>
+                        <button type="button" class="btn btn-outline-secondary btn-move" data-dir="1" aria-label="Xuống">↓</button>
+                    </span>
+                </li>
+            }
+        </ol>
+        <small class="text-muted">Dùng nút ↑ ↓ để sắp xếp.</small>
+        break;
+}

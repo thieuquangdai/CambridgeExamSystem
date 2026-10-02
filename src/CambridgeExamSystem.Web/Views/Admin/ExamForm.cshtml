@@ -1,0 +1,50 @@
+@model CambridgeExamSystem.Web.Models.Admin.ExamFormViewModel
+@{
+    var isNew = Model.Exam.ExamPaperId == 0;
+    ViewData["Title"] = isNew ? "Tạo đề thi" : "Sửa đề thi";
+}
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+<partial name="_AdminNav" />
+<form asp-action="SaveExam" method="post" class="card shadow-sm">
+    <div class="card-body">
+        <div asp-validation-summary="All" class="text-danger small"></div>
+        <input type="hidden" asp-for="Exam.ExamPaperId" />
+        <input type="hidden" asp-for="Exam.IsPublished" />
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label asp-for="Exam.ExamCode" class="form-label">Mã đề</label>
+                <input asp-for="Exam.ExamCode" class="form-control text-uppercase" maxlength="50" required />
+            </div>
+            <div class="col-md-8">
+                <label asp-for="Exam.ExamName" class="form-label">Tên đề</label>
+                <input asp-for="Exam.ExamName" class="form-control" maxlength="200" required />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Exam.LevelId" class="form-label">Cấp độ</label>
+                <select asp-for="Exam.LevelId" class="form-select" required>
+                    <option value="">-- Chọn --</option>
+                    @foreach (var level in Model.Levels)
+                    {
+                        <option value="@level.LevelId">@level.LevelName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Exam.DurationMinutes" class="form-label">Thời gian (phút)</label>
+                <input asp-for="Exam.DurationMinutes" type="number" min="1" max="600" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Exam.PassPercentage" class="form-label">Điểm đạt (%)</label>
+                <input asp-for="Exam.PassPercentage" type="number" min="0" max="100" step="0.01" class="form-control" />
+            </div>
+            <div class="col-12">
+                <label asp-for="Exam.Description" class="form-label">Mô tả</label>
+                <textarea asp-for="Exam.Description" rows="3" class="form-control" maxlength="1000"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <a class="btn btn-outline-secondary" asp-action="Exams">Huỷ</a>
+    </div>
+</form>

@@ -1,0 +1,36 @@
+@model UserAchievementsDto
+@{
+    ViewData["Title"] = "Thành tích";
+    var s = Model.Statistics;
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h1 class="h3 mb-0">Thành tích</h1>
+    <div><span class="badge fs-6 @DisplayFormat.RankBadge(s.CurrentRankCode)">Hạng @s.CurrentRankCode</span> <span class="badge bg-warning text-dark fs-6">@s.TotalStars ★</span></div>
+</div>
+<p class="text-muted">Đã đạt @Model.EarnedCount/@Model.Achievements.Count thành tích · @s.TotalTests bài thi · điểm TB @DisplayFormat.Percent(s.AverageScore) · cao nhất @DisplayFormat.Percent(s.BestPercentage)</p>
+<div class="row g-3">
+    @foreach (var a in Model.Achievements)
+    {
+        <div class="col-sm-6 col-lg-4">
+            <div class="card h-100 achievement @(a.IsEarned ? "earned border-" + (a.BadgeColor ?? "primary") : "locked")">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h2 class="h6 mb-1">@(a.IsEarned ? "🏆" : "🔒") @a.AchievementName</h2>
+                        <span class="badge bg-warning text-dark">+@a.RewardStars ★</span>
+                    </div>
+                    <p class="small text-muted mb-2">@a.Description</p>
+                    @if (a.IsEarned)
+                    {
+                        <small class="text-success">Đạt lúc <time data-utc="@DisplayFormat.LocalTime(a.EarnedAtUtc)"></time></small>
+                    }
+                    else if (a.RequiredTests is int required && required > 0)
+                    {
+                        var pct = Math.Min(100, s.TotalTests * 100 / required);
+                        <div class="progress" role="progressbar" aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100" style="height: 6px"><div class="progress-bar" style="width: @pct%"></div></div>
+                        <small class="text-muted">@Math.Min(s.TotalTests, required)/@required bài</small>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

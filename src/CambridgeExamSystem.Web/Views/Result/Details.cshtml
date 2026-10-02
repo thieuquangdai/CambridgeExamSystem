@@ -1,0 +1,104 @@
+@model AttemptResultDto
+@{
+    ViewData["Title"] = "Kết quả – " + Model.ExamName;
+}
+<div class="result-hero card shadow-sm mb-4 @(Model.IsPassed ? "border-success" : "border-warning")">
+    <div class="card-body text-center p-4">
+        <div class="text-muted">@Model.LevelName</div>
+        <h1 class="h3">@Model.ExamName</h1>
+        <div class="display-4 fw-bold @(Model.IsPassed ? "text-success" : "text-warning")">@DisplayFormat.Percent(Model.PercentageScore)</div>
+        <div class="mb-2">@DisplayFormat.Score(Model.TotalScore)/@DisplayFormat.Score(Model.MaxScore) điểm · @(Model.IsPassed ? "ĐẠT" : "CHƯA ĐẠT") @(Model.PassPercentage is null ? "" : $"(yêu cầu {Model.PassPercentage:0.##}%)")</div>
+        <div class="fs-3 text-warning" aria-label="@Model.StarsEarned sao">+@Model.StarsEarned ★</div>
+        @if (!string.IsNullOrWhiteSpace(Model.ResultMessage))
+        {
+            <p class="lead mt-2 mb-0">@Model.ResultMessage</p>
+        }
+        <div class="row mt-3 small text-muted justify-content-center">
+            <div class="col-auto">✅ Đúng: <strong>@Model.CorrectCount</strong></div>
+            <div class="col-auto">❌ Sai: <strong>@Model.WrongCount</strong></div>
+            <div class="col-auto">⏭ Bỏ trống: <strong>@Model.UnansweredCount</strong></div>
+            <div class="col-auto">⏱ Thời gian: <strong>@DisplayFormat.Duration(Model.TotalSecondsUsed)</strong></div>
+        </div>
+    </div>
+</div>
+
+@if (Model.NewAchievements.Count > 0)
+{
+    <div class="alert alert-warning">
+        <strong>🏆 Thành tích mới!</strong>
+        @foreach (var achievement in Model.NewAchievements)
+        {
+            <span class="badge bg-@(achievement.BadgeColor ?? "primary") ms-1">@achievement.AchievementName (+@achievement.RewardStars ★)</span>
+        }
+    </div>
+}
+
+<h2 class="h5">Kết quả theo phần</h2>
+<div class="table-responsive mb-4">
+    <table class="table">
+        <thead><tr><th>Phần</th><th class="text-end">Đúng</th><th class="text-end">Điểm</th></tr></thead>
+        <tbody>
+            @foreach (var sec in Model.Sections)
+            {
+                <tr><td>@sec.SectionName</td><td class="text-end">@sec.CorrectCount/@sec.QuestionCount</td><td class="text-end">@DisplayFormat.Score(sec.Score)/@DisplayFormat.Score(sec.MaxScore)</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+    <h2 class="h5 mb-0">Chi tiết từng câu</h2>
+    <div class="btn-group btn-group-sm" role="group" aria-label="Lọc">
+        <button type="button" class="btn btn-outline-secondary active" data-filter="all">Tất cả</button>
+        <button type="button" class="btn btn-outline-danger" data-filter="wrong">Sai / bỏ trống</button>
+    </div>
+</div>
+<div class="translatable">
+    @foreach (var q in Model.Questions)
+    {
+        <div class="card mb-3 result-question @(q.IsCorrect ? "border-success" : "border-danger")" data-correct="@(q.IsCorrect ? "true" : "false")">
+            <div class="card-header d-flex justify-content-between">
+                <span>Câu @(q.Index + 1) · <small class="text-muted">@q.SectionName</small></span>
+                <span class="badge @(q.IsCorrect ? "bg-success" : q.IsAnswered ? "bg-danger" : "bg-secondary")">@(q.IsCorrect ? "Đúng" : q.IsAnswered ? "Sai" : "Bỏ trống") · @DisplayFormat.Score(q.ScoreEarned)/@DisplayFormat.Score(q.MaxScore)</span>
+            </div>
+            <div class="card-body">
+                <p class="fw-semibold">@q.QuestionText</p>
+                <p class="mb-1"><span class="text-muted">Bạn trả lời:</span> <span class="@(q.IsCorrect ? "text-success" : "text-danger")">@(q.UserAnswerText ?? "(không trả lời)")</span></p>
+                @if (!q.IsCorrect)
+                {
+                    <p class="mb-1"><span class="text-muted">Đáp án đúng:</span> <span class="text-success fw-semibold">@q.CorrectAnswerText</span></p>
+                }
+                @if (!string.IsNullOrWhiteSpace(q.ExplanationText) || !string.IsNullOrWhiteSpace(q.TranscriptText))
+                {
+                    <details class="mt-2">
+                        <summary>Giải thích</summary>
+                        <div class="mt-2 small">
+                            @if (!string.IsNullOrWhiteSpace(q.ExplanationText)) { <p>@q.ExplanationText</p> }
+                            @if (!string.IsNullOrWhiteSpace(q.GrammarNote)) { <p><strong>Ngữ pháp:</strong> @q.GrammarNote</p> }
+                            @if (!string.IsNullOrWhiteSpace(q.VocabularyNote)) { <p><strong>Từ vựng:</strong> @q.VocabularyNote</p> }
+                            @if (!string.IsNullOrWhiteSpace(q.TranscriptText)) { <p class="fst-italic"><strong>Transcript:</strong> @q.TranscriptText</p> }
+                        </div>
+                    </details>
+                }
+            </div>
+        </div>
+    }
+</div>
+<div class="d-flex gap-2">
+    <form asp-controller="Exam" asp-action="Start" asp-route-id="@Model.ExamPaperId" method="post"><button type="submit" class="btn btn-primary">Làm lại đề này</button></form>
+    <a class="btn btn-outline-secondary" asp-controller="Exam" asp-action="Index">Chọn đề khác</a>
+</div>
+@section Scripts {
+    <script>
+        $(function () {
+            $('[data-filter]').on('click', function () {
+                const filter = $(this).data('filter');
+                $('[data-filter]').removeClass('active');
+                $(this).addClass('active');
+                $('.result-question').each(function () {
+                    $(this).toggleClass('d-none', filter === 'wrong' && $(this).data('correct') === true);
+                });
+            });
+        });
+    </script>
+}

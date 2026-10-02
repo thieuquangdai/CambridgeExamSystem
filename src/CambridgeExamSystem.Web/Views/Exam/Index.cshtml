@@ -1,0 +1,24 @@
+@model CambridgeExamSystem.Web.Models.Exam.ExamIndexViewModel
+@{
+    ViewData["Title"] = "Đề thi";
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h1 class="h3 mb-0">Đề thi</h1>
+    <div class="btn-group flex-wrap" role="group" aria-label="Lọc theo cấp độ">
+        <a class="btn btn-sm @(string.IsNullOrEmpty(Model.SelectedLevel) ? "btn-primary" : "btn-outline-primary")" asp-action="Index">Tất cả</a>
+        @foreach (var level in Model.Levels)
+        {
+            <a class="btn btn-sm @(Model.SelectedLevel == level.LevelCode ? "btn-primary" : "btn-outline-primary")" asp-action="Index" asp-route-level="@level.LevelCode">@level.LevelName</a>
+        }
+    </div>
+</div>
+@if (Model.Exams.Count == 0)
+{
+    <div class="alert alert-light border">Chưa có đề thi nào cho cấp độ này.</div>
+}
+<div class="row g-3">
+    @foreach (var exam in Model.Exams)
+    {
+        <div class="col-md-6 col-lg-4"><partial name="_ExamCard" model="exam" /></div>
+    }
+</div>
