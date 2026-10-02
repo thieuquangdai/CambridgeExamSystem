@@ -1,0 +1,69 @@
+@{
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Cambridge Exam System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body data-authenticated="@(isAuthenticated ? "true" : "false")">
+    <form id="antiforgery-form" class="d-none">@Html.AntiForgeryToken()</form>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-cambridge shadow-sm">
+            <div class="container">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">Cambridge<span class="text-warning">Exam</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link @(controller == "Exam" ? "active" : "")" asp-controller="Exam" asp-action="Index">Đề thi</a></li>
+                        <li class="nav-item"><a class="nav-link @(controller == "Leaderboard" ? "active" : "")" asp-controller="Leaderboard" asp-action="Index">Bảng xếp hạng</a></li>
+                        @if (isAuthenticated)
+                        {
+                            <li class="nav-item"><a class="nav-link @(controller == "Result" ? "active" : "")" asp-controller="Result" asp-action="History">Lịch sử</a></li>
+                            <li class="nav-item"><a class="nav-link @(controller == "Achievement" ? "active" : "")" asp-controller="Achievement" asp-action="Index">Thành tích</a></li>
+                            <li class="nav-item"><a class="nav-link @(controller == "Translation" ? "active" : "")" asp-controller="Translation" asp-action="Index">Từ vựng</a></li>
+                        }
+                        @if (isStaff)
+                        {
+                            <li class="nav-item"><a class="nav-link @(controller == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Index">Quản trị</a></li>
+                        }
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="container py-4">
+        <partial name="_Alerts" />
+        @RenderBody()
+    </main>
+    <footer class="border-top py-3 mt-auto text-muted small">
+        <div class="container d-flex justify-content-between flex-wrap gap-2">
+            <span>&copy; @DateTime.UtcNow.Year Cambridge Exam System</span>
+            @if (isAuthenticated)
+            {
+                <span>Mẹo: bôi đen một từ tiếng Anh để dịch nhanh.</span>
+            }
+        </div>
+    </footer>
+    <div id="translate-popover" class="translate-popover card shadow d-none" role="dialog" aria-live="polite">
+        <div class="card-body p-2">
+            <button type="button" class="btn btn-sm btn-primary w-100" data-action="translate">Dịch</button>
+            <div class="translate-result small d-none"></div>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

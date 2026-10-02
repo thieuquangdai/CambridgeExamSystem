@@ -1,0 +1,7 @@
+@model CambridgeExamSystem.Web.Models.Result.HistoryViewModel
+@{
+    ViewData["Title"] = "Lịch sử làm bài";
+}
+<h1 class="h3 mb-3">Lịch sử làm bài</h1>
+<partial name="_ActiveAttempts" model="Model.ActiveAttempts" />
+<partial name="_HistoryTable" model="Model.Attempts" />

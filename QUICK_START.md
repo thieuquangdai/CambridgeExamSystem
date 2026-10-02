@@ -1,101 +1,35 @@
-# Bắt Đầu Nhanh
+# Bắt đầu nhanh
 
-## ⚡ 5 Phút để Chạy Dự Án
+1. Cài [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) và SQL Server (Windows: LocalDB đi kèm Visual Studio là đủ).
+2. Mở `CambridgeExamSystem.sln` bằng Visual Studio 2022 (17.8+) hoặc VS Code / Rider.
+3. Đặt mật khẩu admin (không commit vào Git):
+   ```bash
+   cd src/CambridgeExamSystem.Web
+   dotnet user-secrets set "Seed:AdminPassword" "Admin@12345"
+   ```
+4. Nếu không dùng LocalDB, đặt connection string:
+   ```bash
+   dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost\SQLEXPRESS;Database=CambridgeExamDb;Trusted_Connection=True;TrustServerCertificate=True"
+   ```
+5. Chạy `dotnet run` (hoặc F5). Database, dữ liệu tham chiếu và đề mẫu được tạo tự động.
+6. Đăng nhập `admin@cambridge.local` để quản trị, hoặc **Đăng ký** một tài khoản học sinh mới.
 
-### Yêu Cầu
-- ✅ Visual Studio 2022 đã cài
-- ✅ SQL Server đã cài
-- ✅ File CambridgeExamSystem.zip đã giải nén
+## Thử các tính năng
 
-### Bước 1: Mở Solution (30 giây)
-```
-1. Visual Studio → File → Open Project/Solution
-2. Chọn: CambridgeExamSystem.sln
-3. Click Open
-```
+| Tính năng | Đường dẫn |
+|-----------|-----------|
+| Danh sách đề, làm bài, tự động lưu | `/Exam` → chọn đề → **Bắt đầu** |
+| Tạm dừng và tiếp tục | Nút **Tạm dừng & thoát**, sau đó mở lại đề hoặc xem trang chủ |
+| Kết quả & giải thích | Sau khi nộp bài, hoặc `/Result/History` |
+| Bảng xếp hạng | `/Leaderboard` |
+| Thành tích | `/Achievement` |
+| Dịch & từ vựng | Bôi đen chữ tiếng Anh trong đề → **Dịch**, hoặc `/Translation` |
+| Quản trị | `/Admin` (vai trò Admin/Teacher) |
 
-### Bước 2: Chạy SQL Scripts (2 phút)
-```
-1. Mở SQL Server Management Studio
-2. Connect to: localhost\SQLEXPRESS
-3. File → Open → SQL Script
-4. Chọn lần lượt:
-   Database/Schema/01_CreateTables.sql → Execute
-   Database/Schema/02_CreateIndexes.sql → Execute
-   Database/Schema/03_CreateRelationships.sql → Execute
-   Database/StoredProcedures/[tất cả] → Execute
-   Database/Seeds/[tất cả] → Execute
-```
+## Lỗi thường gặp
 
-### Bước 3: Cấu Hình Connection String (30 giây)
-```
-1. Visual Studio: Mở CambridgeExamSystem.Web/Web.config
-2. Tìm dòng: <add name="CambridgeDbContext" ...
-3. Thay: Server=YOUR_SERVER
-   Bằng:  Server=localhost\SQLEXPRESS
-4. Lưu file (Ctrl+S)
-```
-
-### Bước 4: Build & Run (2 phút)
-```
-1. Visual Studio: Ctrl+Shift+B (Build)
-2. Đợi build hoàn tất
-3. Nhấn F5 (Run)
-4. Chọn IIS Express
-5. Ứng dụng mở tại: http://localhost:xxxx
-```
-
-### Bước 5: Đăng Nhập (10 giây)
-```
-Username: student1
-Password: Password@123
-Click Login
-```
-
-## ✅ Xong!
-
-Bạn đã có hệ thống Cambridge Exam đầy đủ chính! 🎉
-
-## 🔍 Kiểm Tra Các Tính Năng
-
-1. **Làm Bài Thi**
-   - Home → Chọn Level → Chọn Exam → Start
-
-2. **Xem Kết Quả**
-   - Làm xong bài → Submit → View Results
-
-3. **Bảng Xếp Hạng**
-   - Menu → Leaderboard
-
-4. **Thành Tích**
-   - Menu → Achievements
-
-5. **Dịch Văn Bản**
-   - Quét chuột bất kỳ từ nào → Click dịch
-
-6. **Từ Vựng**
-   - User → Vocabulary Manager
-
-## 🐛 Lỗi Phổ Biến
-
-| Lỗi | Giải Pháp |
-|-----|----------|
-| Cannot connect to database | Kiểm tra SQL Server đang chạy, update Web.config |
-| Invalid object name 'dbo.Users' | Chạy lại 01_CreateTables.sql |
-| Build failed | Xóa bin/obj, rebuild |
-| Localhost không mở | Khởi động lại IIS Express, thay port |
-
-## 📚 Tài Liệu Chi Tiết
-
-- [Hướng Dẫn Cài Đặt Đầy Đủ](INSTALLATION.md)
-- [Thiết Lập Database](Database/DATABASE_SETUP.md)
-- [Kiến Trúc Hệ Thống](Documentation/ARCHITECTURE.md)
-
-## 💬 Cần Giúp?
-
-- Email: thieuquangdai@example.com
-- GitHub Issues: [Report Bug](https://github.com/thieuquangdai/CambridgeExamSystem/issues)
-
----
-
-**Happy Coding! 🚀**
+| Lỗi | Cách xử lý |
+|-----|-----------|
+| `A network-related or instance-specific error` | Kiểm tra SQL Server đang chạy và connection string |
+| Không có tài khoản admin | Chưa đặt `Seed:AdminPassword`; đặt rồi chạy lại ứng dụng |
+| `Login failed for user` | Kiểm tra quyền `dbcreator`/`db_owner` của tài khoản SQL |

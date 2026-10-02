@@ -1,0 +1,25 @@
+@model CambridgeExamSystem.Web.Models.Account.ProfileViewModel
+@{
+    ViewData["Title"] = "Hồ sơ";
+    var s = Model.Statistics;
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="h3 mb-0">@Model.FullName</h1>
+        <div class="text-muted">@Model.Email · @string.Join(", ", Model.Roles) @(Model.CurrentLevelCode is null ? "" : $"· {Model.CurrentLevelCode}")</div>
+    </div>
+    <span class="badge fs-6 @DisplayFormat.RankBadge(s.CurrentRankCode)">Hạng @s.CurrentRankCode</span>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">@s.TotalStars ★</div><div class="stat-label">Sao</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">@s.TotalTests</div><div class="stat-label">Bài đã làm</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">@DisplayFormat.Percent(s.AverageScore)</div><div class="stat-label">Điểm trung bình</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">@s.CurrentStreakDays 🔥</div><div class="stat-label">Chuỗi ngày (dài nhất @s.LongestStreakDays)</div></div></div>
+</div>
+<partial name="_ActiveAttempts" model="Model.ActiveAttempts" />
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="h5 mb-0">Bài làm gần đây</h2>
+    <a asp-controller="Result" asp-action="History">Xem tất cả</a>
+</div>
+<partial name="~/Views/Result/_HistoryTable.cshtml" model="Model.RecentAttempts" />
+<p class="mt-3"><a asp-controller="Achievement" asp-action="Index">Đã đạt @Model.EarnedAchievements thành tích →</a></p>

@@ -1,0 +1,88 @@
+@model CambridgeExamSystem.Web.Models.Admin.ExamContentViewModel
+@{
+    var exam = Model.Content.Exam;
+    ViewData["Title"] = "Nội dung – " + exam.ExamName;
+}
+<h1 class="h3 mb-3">Quản trị</h1>
+<partial name="_AdminNav" />
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="h4 mb-0">@exam.ExamName <span class="badge @(exam.IsPublished ? "bg-success" : "bg-secondary") align-middle fs-6">@(exam.IsPublished ? "Đã xuất bản" : "Nháp")</span></h2>
+        <small class="text-muted"><code>@exam.ExamCode</code> · @exam.LevelName · @exam.DurationMinutes phút · @exam.QuestionCount câu · @DisplayFormat.Score(exam.TotalScore) điểm</small>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary btn-sm" asp-action="EditExam" asp-route-id="@exam.ExamPaperId">Sửa thông tin</a>
+        <form asp-action="TogglePublish" method="post">
+            <input type="hidden" name="id" value="@exam.ExamPaperId" />
+            <input type="hidden" name="publish" value="@(exam.IsPublished ? "false" : "true")" />
+            <button type="submit" class="btn btn-sm @(exam.IsPublished ? "btn-outline-warning" : "btn-success")">@(exam.IsPublished ? "Ẩn đề" : "Xuất bản")</button>
+        </form>
+    </div>
+</div>
+
+@foreach (var sec in Model.Content.Sections)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><span class="badge @DisplayFormat.SectionBadge(sec.SectionCode) me-2">@sec.SectionCode</span><strong>@sec.SectionName</strong> <small class="text-muted">· @sec.Questions.Count câu · @DisplayFormat.Score(sec.MaxScore) điểm</small></span>
+            <a class="btn btn-sm btn-primary" asp-action="AddQuestion" asp-route-examPaperId="@exam.ExamPaperId" asp-route-sectionId="@sec.ExamSectionId">+ Câu hỏi</a>
+        </div>
+        @if (sec.Questions.Count == 0)
+        {
+            <div class="card-body text-muted small">Chưa có câu hỏi.</div>
+        }
+        <ul class="list-group list-group-flush">
+            @foreach (var q in sec.Questions)
+            {
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between gap-2">
+                        <div>
+                            <span class="text-muted">@q.QuestionOrder.</span>
+                            <span class="badge bg-light text-dark border">@q.TypeName</span>
+                            <span>@q.QuestionText</span>
+                            <small class="text-muted">(@DisplayFormat.Score(q.Score) điểm)</small>
+                        </div>
+                        <form asp-action="DeactivateQuestion" method="post" onsubmit="return confirm('Ẩn câu hỏi này?');">
+                            <input type="hidden" name="id" value="@q.QuestionId" />
+                            <input type="hidden" name="examPaperId" value="@exam.ExamPaperId" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Ẩn</button>
+                        </form>
+                    </div>
+                    <div class="small mt-1">
+                        @if (q.Options.Count > 0)
+                        {
+                            foreach (var o in q.Options)
+                            {
+                                <span class="me-3 @(o.IsCorrect ? "text-success fw-semibold" : "text-muted")">@(o.IsCorrect ? "✔" : "•") @o.OptionText @(o.MatchingKey is null ? "" : "→ " + o.MatchingKey)</span>
+                            }
+                        }
+                        @if (!string.IsNullOrWhiteSpace(q.CorrectTextAnswer))
+                        {
+                            <span class="text-success">Đáp án: @q.CorrectTextAnswer</span>
+                        }
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+<div class="card border-dashed">
+    <div class="card-header">Thêm phần thi</div>
+    <div class="card-body">
+        <form asp-action="AddSection" method="post" class="row g-2">
+            <input type="hidden" asp-for="NewSection.ExamPaperId" />
+            <div class="col-md-3">
+                <select asp-for="NewSection.SectionCode" class="form-select" required aria-label="Kỹ năng">
+                    @foreach (var code in SectionCodes.All)
+                    {
+                        <option value="@code">@code</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4"><input asp-for="NewSection.SectionName" class="form-control" placeholder="Tên phần (vd: Reading Part 1)" required /></div>
+            <div class="col-md-3"><input asp-for="NewSection.SectionDescription" class="form-control" placeholder="Mô tả" /></div>
+            <div class="col-md-2 d-grid"><button type="submit" class="btn btn-outline-primary">Thêm</button></div>
+        </form>
+    </div>
+</div>

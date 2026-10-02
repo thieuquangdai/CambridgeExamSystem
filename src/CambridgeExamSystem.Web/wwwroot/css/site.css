@@ -1,0 +1,45 @@
+:root {
+    --cambridge: #0b3d6b;
+    --cambridge-light: #1d6fb8;
+}
+
+html { position: relative; min-height: 100%; font-size: 15px; }
+@media (min-width: 768px) { html { font-size: 16px; } }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+
+.bg-cambridge { background-color: var(--cambridge) !important; }
+.text-cambridge { color: var(--cambridge) !important; }
+.bg-bronze { background-color: #b0712f; color: #fff; }
+
+.hero { background: linear-gradient(135deg, var(--cambridge), var(--cambridge-light)); }
+
+.level-card, .exam-card { transition: transform .15s ease, box-shadow .15s ease; }
+.level-card:hover, .exam-card:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.08); }
+
+.stat-card { background: #fff; border: 1px solid rgba(0,0,0,.08); border-radius: .75rem; padding: 1rem; text-align: center; height: 100%; }
+.stat-value { font-size: 1.5rem; font-weight: 700; color: var(--cambridge); }
+.stat-label { font-size: .85rem; color: #6c757d; }
+
+.exam-toolbar { z-index: 1010; }
+.question-panel .option-item { padding: .5rem .75rem .5rem 2rem; border: 1px solid rgba(0,0,0,.08); border-radius: .5rem; margin-bottom: .5rem; }
+.question-panel .option-item:hover { background: #f5f9ff; }
+.passage-text { white-space: pre-line; }
+.question-palette { position: sticky; top: 5rem; }
+.palette-btn { width: 2.5rem; }
+.palette-btn.answered { background: #198754; border-color: #198754; color: #fff; }
+.palette-btn.current { outline: 3px solid #ffc107; outline-offset: 1px; }
+.legend { display: inline-block; width: .8rem; height: .8rem; border-radius: .2rem; vertical-align: middle; }
+.legend-answered { background: #198754; }
+.legend-current { border: 2px solid #ffc107; }
+#timer.warning { background-color: #dc3545 !important; animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: .6; } }
+
+.achievement.locked { opacity: .65; }
+.achievement.earned { border-width: 2px; }
+.border-dashed { border-style: dashed; }
+
+.translate-popover { position: absolute; z-index: 2000; width: 280px; }
+.translate-popover .translate-result { margin-top: .25rem; }
+
+.bg-warning-subtle { background-color: #fff3cd; }
+.bg-body-tertiary { background-color: #f8f9fa; }

@@ -1,0 +1,39 @@
+@model List<CambridgeExamSystem.Web.Models.Admin.UserRowViewModel>
+@{
+    ViewData["Title"] = "Người dùng";
+}
+<h1 class="h3 mb-3">Quản trị</h1>
+<partial name="_AdminNav" />
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead><tr><th>Họ tên</th><th>Email</th><th>Đăng ký</th><th>Đăng nhập gần nhất</th><th>Vai trò</th><th>Trạng thái</th></tr></thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.FullName</td>
+                    <td>@u.Email</td>
+                    <td><time data-utc="@DisplayFormat.LocalTime(u.CreatedAtUtc)"></time></td>
+                    <td><time data-utc="@DisplayFormat.LocalTime(u.LastLoginAtUtc)"></time></td>
+                    <td>
+                        <form asp-action="SetRole" method="post" class="d-flex gap-1">
+                            <input type="hidden" name="userId" value="@u.UserId" />
+                            <select name="role" class="form-select form-select-sm" aria-label="Vai trò" onchange="this.form.submit()">
+                                @foreach (var role in RoleNames.All)
+                                {
+                                    <option value="@role" selected="@(u.Role == role)">@role</option>
+                                }
+                            </select>
+                        </form>
+                    </td>
+                    <td>
+                        <form asp-action="ToggleActive" method="post">
+                            <input type="hidden" name="userId" value="@u.UserId" />
+                            <button type="submit" class="btn btn-sm @(u.IsActive ? "btn-outline-success" : "btn-outline-danger")">@(u.IsActive ? "Hoạt động" : "Đã khoá")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

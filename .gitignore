@@ -80,3 +80,10 @@ desktop.ini
 # Distribution
 /publish/
 /PublishProfiles/
+
+# Keep the committed development settings (contains no secrets)
+!appsettings.Development.json
+
+# User uploads
+src/CambridgeExamSystem.Web/wwwroot/uploads/*
+!src/CambridgeExamSystem.Web/wwwroot/uploads/.gitkeep
